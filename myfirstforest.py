@@ -31,8 +31,8 @@ if __name__ == '__main__':
     
     # Collect the test data's PassengerIds then drop it from the train and test sets
     submit_ids = submit_df['PassengerId']
-    input_df.drop(['PassengerId'], axis=1, inplace=1) 
-    submit_df.drop(['PassengerId'], axis=1, inplace=1) 
+    input_df.drop(['PassengerId'], axis=1, inplace=True) 
+    submit_df.drop(['PassengerId'], axis=1, inplace=True) 
     
     # Run dimensionality reduction and clustering on the remaining feature set. This will return an unlabeled
     # set of derived parameters along with the ClusterID so we can train multiple models for different groups

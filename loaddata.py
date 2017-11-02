@@ -49,7 +49,7 @@ def processCabin():
     # scale the number to process as a continuous feature
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['CabinNumber_scaled'] = scaler.fit_transform(df['CabinNumber'])
+        df['CabinNumber_scaled'] = scaler.fit_transform(df['CabinNumber'].reshape(-1,1))
 
 
 def getCabinLetter(cabin):
@@ -104,7 +104,7 @@ def processTicket():
     
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['TicketNumber_scaled'] = scaler.fit_transform(df['TicketNumber'])
+        df['TicketNumber_scaled'] = scaler.fit_transform(df['TicketNumber'].reshape(-1,1))
 
 
 def getTicketPrefix(ticket):
@@ -147,11 +147,11 @@ def processFare():
     # center and scale the fare to use as a continuous variable
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Fare_scaled'] = scaler.fit_transform(df['Fare'])
+        df['Fare_scaled'] = scaler.fit_transform(df['Fare'].reshape(-1,1))
     
     if keep_bins and keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Fare_bin_id_scaled'] = scaler.fit_transform(df['Fare_bin_id'])
+        df['Fare_bin_id_scaled'] = scaler.fit_transform(df['Fare_bin_id'].reshape(-1,1))
     
     
     if not keep_strings:
@@ -186,7 +186,7 @@ def processPClass():
     
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Pclass_scaled'] = scaler.fit_transform(df['Pclass'])
+        df['Pclass_scaled'] = scaler.fit_transform(df['Pclass'].reshape(-1,1))
 
 
 ### Generate features from the SibSp and Parch variables
@@ -200,8 +200,8 @@ def processFamily():
     # First process scaling
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['SibSp_scaled'] = scaler.fit_transform(df['SibSp'])
-        df['Parch_scaled'] = scaler.fit_transform(df['Parch'])
+        df['SibSp_scaled'] = scaler.fit_transform(df['SibSp'].reshape(-1,1))
+        df['Parch_scaled'] = scaler.fit_transform(df['Parch'].reshape(-1,1))
      
     # Then build binary features
     if keep_binary:
@@ -239,14 +239,14 @@ def processName():
     # process scaling
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Names_scaled'] = scaler.fit_transform(df['Names'])
+        df['Names_scaled'] = scaler.fit_transform(df['Names'].reshape(-1,1))
     
     if keep_bins:
         df['Title_id'] = pd.factorize(df['Title'])[0]+1
     
     if keep_bins and keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Title_id_scaled'] = scaler.fit_transform(df['Title_id'])
+        df['Title_id_scaled'] = scaler.fit_transform(df['Title_id'].reshape(-1,1))
     
 
 ### Generate features from the Age variable
@@ -257,7 +257,7 @@ def processAge():
     # center the mean and scale to unit variance
     if keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Age_scaled'] = scaler.fit_transform(df['Age'])
+        df['Age_scaled'] = scaler.fit_transform(df['Age'].reshape(-1,1))
     
     # have a feature for children
     df['isChild'] = np.where(df.Age < 13, 1, 0)
@@ -272,7 +272,7 @@ def processAge():
     
     if keep_bins and keep_scaled:
         scaler = preprocessing.StandardScaler()
-        df['Age_bin_id_scaled'] = scaler.fit_transform(df['Age_bin_id'])
+        df['Age_bin_id_scaled'] = scaler.fit_transform(df['Age_bin_id'].reshape(-1,1))
     
     if not keep_strings:
         df.drop('Age_bin', axis=1, inplace=True)
@@ -453,7 +453,7 @@ def getDataSets(binary=False, bins=False, scaled=False, strings=False, raw=True,
         input_df, submit_df = reduceAndCluster(input_df, submit_df)
     else:
         # drop the empty 'Survived' column for the test set that was created during set concatentation
-        submit_df.drop('Survived', axis=1, inplace=1)
+        submit_df.drop('Survived', axis=1, inplace=True)
     
     print "\n", input_df.columns.size, "initial features generated...\n" #, input_df.columns.values
     
@@ -463,7 +463,7 @@ def getDataSets(binary=False, bins=False, scaled=False, strings=False, raw=True,
         print 'Survived data shape:', input_df[input_df.Survived==1].shape
         perished_sample = rd.sample(input_df[input_df.Survived==0].index, input_df[input_df.Survived==1].shape[0])
         input_df = pd.concat([input_df.ix[perished_sample], input_df[input_df.Survived==1]])
-        input_df.sort(inplace=True)
+        input_df.sort_index(inplace=True)
         print 'New even class training shape:', input_df.shape
     
     return input_df, submit_df
@@ -541,7 +541,7 @@ def reduceAndCluster(input_df, submit_df, clusters=3):
     submit_df = df[input_df.shape[0]:]
     submit_df.reset_index(inplace=True)
     submit_df.drop('index', axis=1, inplace=True)
-    submit_df.drop('Survived', axis=1, inplace=1)
+    submit_df.drop('Survived', axis=1, inplace=True)
     
     return input_df, submit_df
 
@@ -555,8 +555,8 @@ if __name__ == '__main__':
     """
     train, test = getDataSets(bins=True, scaled=True, binary=True)
     drop_list = ['PassengerId']
-    train.drop(drop_list, axis=1, inplace=1) 
-    test.drop(drop_list, axis=1, inplace=1)
+    train.drop(drop_list, axis=1, inplace=True) 
+    test.drop(drop_list, axis=1, inplace=True)
     
     train, test = reduceAndCluster(train, test)
     
